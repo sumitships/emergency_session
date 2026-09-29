@@ -423,8 +423,8 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--color-cta);
+  color: var(--color-cta-text);
   border: none;
   border-radius: var(--radius-pill);
   padding: 12px 22px;
@@ -435,7 +435,7 @@ main {
   cursor: pointer;
 }
 
-.home-btn:active { background: var(--color-panel-secondary); }
+.home-btn:active { background: var(--color-cta-pressed); }
 
 .spinner-dot {
   width: 8px;

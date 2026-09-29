@@ -30,7 +30,6 @@
     screenEmergency: document.getElementById('screen-emergency'),
     screenWaitlist: document.getElementById('screen-waitlist'),
     ctaDeck: document.getElementById('cta-deck'),
-    waitlistNote: document.getElementById('waitlist-astro-note'),
     backBtn: document.getElementById('back-btn'),
     homeBtn: document.getElementById('home-btn'),
     avatarIcon: document.getElementById('avatar-icon'),
@@ -48,6 +47,10 @@
       fetch('/api/event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
     }
   }
+
+  // Fired immediately, independent of whether /api/lookup ever resolves —
+  // so a page visit is always recorded even if that request fails or is slow.
+  logEvent('page_view', { page: PAGE_NAME, in_webview: !!window.ReactNativeWebView });
 
   function showFallbackAvatar() {
     els.avatarIcon.classList.remove('has-photo');
@@ -93,9 +96,6 @@
     els.screenEmergency.classList.remove('active');
     els.screenWaitlist.classList.add('active');
     els.ctaDeck.style.display = 'none';
-    if (state.astroName) {
-      els.waitlistNote.textContent = "You'll be first in line to reach " + state.astroName + '.';
-    }
     logEvent('waitlist_view', { astro_name: state.astroName });
   }
 

@@ -107,10 +107,15 @@ Secret and get injected as env vars.
 
 ## Events tracked
 
-- `astro_emergency_view` — page loaded, user found in lookup table
-- `astro_emergency_view_fallback` — page loaded, user not found (generic astrologer shown)
+- `page_view` — fired immediately on script load, independent of whether
+  `/api/lookup` ever resolves (so a visit is always recorded even if that
+  request fails or is slow)
+- `astro_emergency_view` — lookup resolved, user found in lookup table
+- `astro_emergency_view_fallback` — lookup resolved, user not found (generic astrologer shown)
+- `back_click` — header back button tapped
 - `start_chat_click` — CTA tapped
 - `waitlist_view` — waitlist confirmation screen shown
+- `return_home_click` — "Back to Home" button tapped
 
 ## Local dev
 
