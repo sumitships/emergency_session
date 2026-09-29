@@ -53,10 +53,10 @@ step needed for this fake-door project.
 
 ## Redash sync
 
-The Redash saved query is expected to return rows shaped like:
-`{ user_id, last_astro_talked_to, astro_image_url }` (see `lib/redash-sync.js`
-for the exact field-name fallbacks it accepts — adjust there if your query's
-column names differ). `astro_cpm` is optional in the row — if the query
+The Redash saved query (id 20556) returns rows shaped like:
+`{ user_id, last_expert_name, last_expert_profile_picture_url }` (see
+`lib/redash-sync.js` for the exact field-name fallbacks it accepts).
+`astro_cpm` is optional in the row — if the query
 doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 
 Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (the
@@ -148,8 +148,6 @@ pool.query('SELECT COUNT(*) FROM astro_user_lookup')
 
 ## Open questions carried over from the brief
 
-- Exact Redash column names if they differ from `user_id` /
-  `last_astro_talked_to` / `astro_image_url` (adjust `lib/redash-sync.js`).
 - Whether this shares the `pooja-fakedoor` Postgres DB or gets its own.
 - Sync freshness requirement (hourly vs daily) — controls
   `REDASH_SYNC_INTERVAL_MINUTES` / the CronJob schedule.
