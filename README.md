@@ -60,13 +60,26 @@ column names differ). `astro_cpm` is optional in the row — if the query
 doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 
 Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (the
-`/results.json` suffix is optional — it's stripped off either way). The sync
-does **not** rely on Redash's cached result — `/api/queries/<id>/results.json`
-404s with "No cached result found" if the query has never run or has no
-refresh schedule set in the Redash UI. Instead it triggers a fresh execution
-via `/api/queries/<id>/refresh`, polls `/api/jobs/<job_id>` until it
+`/results.json` suffix is optional — it's stripped off either way).
+
+The sync tries to trigger a fresh execution rather than trust a stale cache:
+it POSTs `/api/queries/<id>/refresh`, polls `/api/jobs/<job_id>` until it
 finishes (up to `REDASH_REFRESH_TIMEOUT_MS`, default 60s), then fetches
 `/api/query_results/<id>.json`.
+
+**Key scope matters here.** A **query-scoped** API key (the one shown on an
+individual query's page — this is what the brief expects, since it's
+least-privilege) is only allowed to read that query's *cached* result, not
+trigger `/refresh` — Redash returns `403 "Please use a user API key"`. When
+that happens, the sync automatically falls back to GETting
+`/api/queries/<id>/results.json` (the cached result) instead. That only
+works if the query has a **Refresh Schedule** configured in the Redash UI
+(open the query → schedule/clock icon → set an interval matching how fresh
+you need the data) — otherwise even the fallback 404s with "No cached result
+found" because nothing has ever populated the cache. A **user-level** API
+key (from account profile settings) can skip needing a schedule since it's
+allowed to trigger `/refresh` itself, but it's a broader-permission key than
+this project needs.
 
 Two ways to run the sync, per the KT brief:
 
