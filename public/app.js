@@ -2,6 +2,24 @@
   var params = new URLSearchParams(window.location.search);
   var userId = params.get('user_id') || '';
 
+  // Same back-navigation pattern used on bhagya-score. Inside the
+  // AstroLokal app's React Native WebView, firing the deeplink would stack
+  // a NEW Home screen on top of this WebView instead of actually going
+  // back — so the postMessage bridge (which the native side pops the
+  // WebView for directly) is always tried first. The deeplink is only a
+  // fallback for when this page is opened outside the app WebView (plain
+  // browser, no bridge injected).
+  var DEEPLINK_SCHEME = 'astrolokal://BottomTabs?screen=Home';
+  var PAGE_NAME = 'emergency_astro_connect';
+
+  function sendBackAction() {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ action: 'GO_BACK' }));
+      return true;
+    }
+    return false;
+  }
+
   var els = {
     astroName: document.getElementById('astro-name'),
     connectSubtext: document.getElementById('connect-subtext'),
@@ -13,6 +31,7 @@
     screenWaitlist: document.getElementById('screen-waitlist'),
     ctaDeck: document.getElementById('cta-deck'),
     waitlistNote: document.getElementById('waitlist-astro-note'),
+    backBtn: document.getElementById('back-btn'),
     homeBtn: document.getElementById('home-btn'),
     avatarIcon: document.getElementById('avatar-icon'),
     astroPhoto: document.getElementById('astro-photo'),
@@ -93,13 +112,17 @@
       .finally(goToWaitlist);
   });
 
+  els.backBtn.addEventListener('click', function () {
+    logEvent('back_click', { astro_name: state.astroName });
+    if (sendBackAction()) return;
+    window.location.href = DEEPLINK_SCHEME + '&source=' + PAGE_NAME + '_back';
+  });
+
   els.homeBtn.addEventListener('click', function () {
     logEvent('return_home_click', { astro_name: state.astroName });
-    // Best-effort: same back-navigation convention as the header's back
-    // button. If this page is opened inside the AstroLokal app's WebView,
-    // history.back() returns to the screen that opened this page (the home
-    // tab in the common case).
-    history.back();
+    if (sendBackAction()) return;
+    window.location.href =
+      DEEPLINK_SCHEME + '&source=' + PAGE_NAME + '_home&user_id=' + encodeURIComponent(userId);
   });
 
   fetch('/api/lookup?user_id=' + encodeURIComponent(userId))
