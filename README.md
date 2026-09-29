@@ -81,13 +81,21 @@ key (from account profile settings) can skip needing a schedule since it's
 allowed to trigger `/refresh` itself, but it's a broader-permission key than
 this project needs.
 
-Two ways to run the sync, per the KT brief:
+Three ways to run the sync:
 
-- **Option A (recommended): Devtron CronJob** running `node sync-redash.js`
-  on a schedule. Needs `DATABASE_URL`, `REDASH_QUERY_URL`, `REDASH_API_KEY`.
-- **Option B (simpler, less robust):** leave `REDASH_QUERY_URL` /
-  `REDASH_API_KEY` set on the main app — `server.js` runs the same sync via
-  `setInterval` every `REDASH_SYNC_INTERVAL_MINUTES` (default 10).
+- **Manual, one-off:** `node sync-redash.js` from a Devtron pod terminal (or
+  locally). Runs once and exits — good for testing or a single backfill.
+- **Option A (recommended for production): Devtron CronJob** running
+  `node sync-redash.js` on a schedule. Needs `DATABASE_URL`,
+  `REDASH_QUERY_URL`, `REDASH_API_KEY`.
+- **Option B (simpler, less robust):** set `REDASH_AUTO_SYNC=true` on the
+  main app — `server.js` then runs the same sync itself via `setInterval`
+  every `REDASH_SYNC_INTERVAL_MINUTES` (default 10).
+
+`REDASH_QUERY_URL`/`REDASH_API_KEY` alone do **not** start any recurring
+sync — `server.js` only loops when `REDASH_AUTO_SYNC=true` is explicitly
+set, so having those two set (needed for manual/CronJob runs regardless)
+won't surprise you with an unwanted background sync.
 
 Never hardcode `REDASH_API_KEY` or `DATABASE_URL` — both go into a Devtron
 Secret and get injected as env vars.

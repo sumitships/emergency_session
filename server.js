@@ -245,6 +245,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 async function startRedashSyncLoop() {
+  // Opt-in only. REDASH_QUERY_URL/REDASH_API_KEY are also needed for manual
+  // one-off `node sync-redash.js` runs (e.g. from a Devtron pod terminal),
+  // and merely having them set must not silently also start a recurring
+  // background sync here — that's a separate decision (REDASH_AUTO_SYNC).
+  if (process.env.REDASH_AUTO_SYNC !== 'true') {
+    console.log('[redash-sync] REDASH_AUTO_SYNC not set to "true", setInterval sync disabled (run node sync-redash.js manually, or as a Devtron CronJob, instead)');
+    return;
+  }
+
   const p = getPool();
   if (!p || !process.env.REDASH_QUERY_URL || !process.env.REDASH_API_KEY) return;
 
