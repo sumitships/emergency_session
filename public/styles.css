@@ -168,13 +168,18 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  /* Some Android WebView versions fail to clip children to border-radius
+     via overflow:hidden alone — force it with a circular mask instead. */
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #000 100%);
 }
 
 .astro-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-pill);
+  border-radius: 50%;
+  /* Belt-and-suspenders: clip the image itself too, not just the wrapper. */
+  -webkit-mask-image: -webkit-radial-gradient(circle, #fff 100%, #000 100%);
 }
 
 .avatar-icon.has-photo { background: var(--color-panel-secondary); }
