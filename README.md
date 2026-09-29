@@ -59,32 +59,32 @@ The Redash saved query (id 20556) returns rows shaped like:
 `astro_cpm` is optional in the row — if the query
 doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 
-Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (the
-`/results.json` suffix is optional — it's stripped off either way).
+Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (or set
+`REDASH_HOST` + `REDASH_QUERY_ID` separately instead — either works).
 
-The sync prefers reading whatever Redash already has **cached**
-(`/api/queries/<id>/results.json`) — fast, no waiting. It only triggers a
-brand-new execution (`POST /api/queries/<id>/refresh`, poll
-`/api/jobs/<job_id>` up to `REDASH_REFRESH_TIMEOUT_MS`, default 20 minutes,
-then fetch `/api/query_results/<id>.json`) when there's no cache yet at all
-— e.g. the very first run. For a large query (this one is 1.6M+ rows),
-forcing a fresh synchronous execution on every sync would be far slower
-than just reading a recently-cached result.
+Following the same pattern as the sibling
+[daily-cast](https://github.com/nitink-wq/daily-cast/tree/redash-booking-sync)
+project's `src/redash-sync.js`, the sync does a **plain GET** against
+Redash's already-cached `/api/queries/<id>/results.json` (timeout
+`REDASH_FETCH_TIMEOUT_MS`, default 20s) — it does **not** try to trigger
+execution itself. An earlier version tried a trigger-and-poll approach and
+it kept timing out against this query's 1.6M rows; reading a cache is fast
+and simple, and is what a production sync should do instead.
 
-This means you need a **Refresh Schedule** configured on the query in the
-Redash UI (open the query → schedule/clock icon → set an interval matching
-how fresh you need the data, e.g. hourly) — that's what keeps the cache
-populated so most syncs hit the fast path.
+This means **someone needs to have run the query at least once in the
+Redash UI** (open it and let it execute, or click Refresh — a one-time
+action, no recurring schedule required) before this can read anything. If
+you do want fresher data without re-running it manually each time, setting
+a Refresh Schedule on the query (schedule/clock icon) is one way to do
+that, but it's optional.
 
-**Key scope matters for the fallback path.** A **query-scoped** API key
-(the one shown on an individual query's page — this is what the brief
-expects, since it's least-privilege) is only allowed to read a cached
-result, not trigger `/refresh` — Redash returns `403 "Please use a user
-API key"`. If that happens *and* there's no cache yet either, the sync has
-nothing left to try and fails with a clear error telling you to set the
-Refresh Schedule (or switch to a user-level key, which can trigger
-`/refresh` itself but is a broader-permission key than this project
-needs).
+Each sync **replaces the entire `astro_user_lookup` table** (`DELETE` +
+bulk `INSERT` via `unnest`, inside one transaction) rather than upserting
+row by row — since this table is entirely derived from Redash with no
+other writer, a clean replace is both faster for 1M+ rows and avoids
+leftover stale rows for users the query no longer returns. A Postgres
+advisory lock (`pg_advisory_xact_lock`) serializes this across pods, so
+it's safe to run even with multiple replicas up at once.
 
 Three ways to run the sync:
 
