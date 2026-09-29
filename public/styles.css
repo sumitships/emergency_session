@@ -154,8 +154,8 @@ main {
 }
 
 .avatar-icon {
-  width: 84px;
-  height: 84px;
+  width: 104px;
+  height: 104px;
   border-radius: var(--radius-pill);
   background: radial-gradient(circle at 35% 28%, #FFFFFF 0%, var(--color-panel-secondary) 55%, var(--color-panel-primary) 100%);
   box-shadow:
