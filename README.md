@@ -59,6 +59,15 @@ for the exact field-name fallbacks it accepts — adjust there if your query's
 column names differ). `astro_cpm` is optional in the row — if the query
 doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 
+Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (the
+`/results.json` suffix is optional — it's stripped off either way). The sync
+does **not** rely on Redash's cached result — `/api/queries/<id>/results.json`
+404s with "No cached result found" if the query has never run or has no
+refresh schedule set in the Redash UI. Instead it triggers a fresh execution
+via `/api/queries/<id>/refresh`, polls `/api/jobs/<job_id>` until it
+finishes (up to `REDASH_REFRESH_TIMEOUT_MS`, default 60s), then fetches
+`/api/query_results/<id>.json`.
+
 Two ways to run the sync, per the KT brief:
 
 - **Option A (recommended): Devtron CronJob** running `node sync-redash.js`
