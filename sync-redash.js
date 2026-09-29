@@ -16,8 +16,10 @@ async function main() {
         user_id TEXT PRIMARY KEY,
         astro_name TEXT NOT NULL,
         astro_cpm INTEGER NOT NULL,
+        astro_image_url TEXT,
         synced_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
+      ALTER TABLE astro_user_lookup ADD COLUMN IF NOT EXISTS astro_image_url TEXT;
     `);
     const result = await syncOnce(pool);
     console.log('[sync-redash] done', result);
