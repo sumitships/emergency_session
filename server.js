@@ -34,8 +34,10 @@ async function ensureSchema() {
       user_id TEXT PRIMARY KEY,
       astro_name TEXT NOT NULL,
       astro_cpm INTEGER NOT NULL,
+      astro_image_url TEXT,
       synced_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
+    ALTER TABLE astro_user_lookup ADD COLUMN IF NOT EXISTS astro_image_url TEXT;
     CREATE TABLE IF NOT EXISTS waitlist (
       user_id TEXT PRIMARY KEY,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -123,7 +125,7 @@ async function handleLookup(req, res, query) {
   if (p && userId) {
     try {
       const { rows } = await p.query(
-        'SELECT astro_name, astro_cpm FROM astro_user_lookup WHERE user_id = $1',
+        'SELECT astro_name, astro_cpm, astro_image_url FROM astro_user_lookup WHERE user_id = $1',
         [userId]
       );
       if (rows.length) {
@@ -133,6 +135,7 @@ async function handleLookup(req, res, query) {
           astro_name: rows[0].astro_name,
           astro_cpm: cpm,
           emergency_cpm: Math.round(cpm * EMERGENCY_MULTIPLIER),
+          astro_image_url: rows[0].astro_image_url || null,
         });
       }
     } catch (err) {
@@ -146,6 +149,7 @@ async function handleLookup(req, res, query) {
     astro_name: DEFAULT_ASTRO_NAME,
     astro_cpm: DEFAULT_ASTRO_CPM,
     emergency_cpm: Math.round(DEFAULT_ASTRO_CPM * EMERGENCY_MULTIPLIER),
+    astro_image_url: null,
   });
 }
 

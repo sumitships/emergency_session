@@ -167,7 +167,17 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
+
+.astro-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-pill);
+}
+
+.avatar-icon.has-photo { background: var(--color-panel-secondary); }
 
 .avatar-icon img { filter: drop-shadow(0 3px 4px rgba(244, 87, 34, 0.25)); }
 

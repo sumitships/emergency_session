@@ -27,6 +27,7 @@ CREATE TABLE astro_user_lookup (
   user_id TEXT PRIMARY KEY,
   astro_name TEXT NOT NULL,
   astro_cpm INTEGER NOT NULL,     -- regular rate, rupees/min
+  astro_image_url TEXT,           -- profile photo shown on the avatar; falls back to the AstroLokal sun icon when null
   synced_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -53,9 +54,10 @@ step needed for this fake-door project.
 ## Redash sync
 
 The Redash saved query is expected to return rows shaped like:
-`{ user_id, recent_astro_name, astro_cpm }` (see `lib/redash-sync.js` for the
-exact field-name fallbacks it accepts — adjust there if your query's column
-names differ).
+`{ user_id, last_astro_talked_to, astro_image_url }` (see `lib/redash-sync.js`
+for the exact field-name fallbacks it accepts — adjust there if your query's
+column names differ). `astro_cpm` is optional in the row — if the query
+doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 
 Two ways to run the sync, per the KT brief:
 
@@ -125,7 +127,7 @@ pool.query('SELECT COUNT(*) FROM astro_user_lookup')
 ## Open questions carried over from the brief
 
 - Exact Redash column names if they differ from `user_id` /
-  `recent_astro_name` / `astro_cpm` (adjust `lib/redash-sync.js`).
+  `last_astro_talked_to` / `astro_image_url` (adjust `lib/redash-sync.js`).
 - Whether this shares the `pooja-fakedoor` Postgres DB or gets its own.
 - Sync freshness requirement (hourly vs daily) — controls
   `REDASH_SYNC_INTERVAL_MINUTES` / the CronJob schedule.

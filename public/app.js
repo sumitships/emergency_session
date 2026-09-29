@@ -14,6 +14,9 @@
     ctaDeck: document.getElementById('cta-deck'),
     waitlistNote: document.getElementById('waitlist-astro-note'),
     homeBtn: document.getElementById('home-btn'),
+    avatarIcon: document.getElementById('avatar-icon'),
+    astroPhoto: document.getElementById('astro-photo'),
+    astroFallback: document.getElementById('astro-fallback'),
   };
 
   var state = { astroName: '', emergencyCpm: 0, found: false };
@@ -27,6 +30,27 @@
     }
   }
 
+  function showFallbackAvatar() {
+    els.avatarIcon.classList.remove('has-photo');
+    els.astroPhoto.hidden = true;
+    els.astroFallback.hidden = false;
+  }
+
+  function setAvatarPhoto(imageUrl, astroName) {
+    if (!imageUrl) {
+      showFallbackAvatar();
+      return;
+    }
+    els.astroPhoto.onload = function () {
+      els.avatarIcon.classList.add('has-photo');
+      els.astroFallback.hidden = true;
+      els.astroPhoto.hidden = false;
+    };
+    els.astroPhoto.onerror = showFallbackAvatar;
+    els.astroPhoto.alt = astroName || '';
+    els.astroPhoto.src = imageUrl;
+  }
+
   function render(data) {
     state.astroName = data.astro_name;
     state.emergencyCpm = data.emergency_cpm;
@@ -34,6 +58,7 @@
 
     els.astroName.textContent = data.astro_name;
     els.connectSubtext.textContent = "They're offline right now, but we'll try calling them for you.";
+    setAvatarPhoto(data.astro_image_url, data.astro_name);
     els.regularPrice.innerHTML = '₹' + data.astro_cpm + '<span class="unit">/min</span>';
     els.emergencyPrice.innerHTML = '₹' + data.emergency_cpm + '<span class="unit">/min</span>';
     els.ctaLabel.textContent = 'Try Emergency Session @ ₹' + data.emergency_cpm + '/min';

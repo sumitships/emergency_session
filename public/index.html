@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=5">
+<link rel="stylesheet" href="/styles.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -29,8 +29,9 @@
     <section id="screen-emergency" class="screen active">
       <div class="hero-card">
         <div class="avatar-wrap">
-          <div class="avatar-icon">
-            <img src="/assets/astrolokal-logo.png" alt="" width="56" height="56">
+          <div class="avatar-icon" id="avatar-icon">
+            <img id="astro-photo" class="astro-photo" alt="" hidden>
+            <img id="astro-fallback" src="/assets/astrolokal-logo.png" alt="" width="56" height="56">
           </div>
           <div class="status-pill"><span class="dot"></span><span>Currently Offline</span></div>
         </div>
@@ -94,6 +95,6 @@
     </button>
   </div>
 </div>
-<script src="/app.js?v=3"></script>
+<script src="/app.js?v=4"></script>
 </body>
 </html>
