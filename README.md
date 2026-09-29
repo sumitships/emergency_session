@@ -62,24 +62,29 @@ doesn't return a rate, `DEFAULT_ASTRO_CPM` is used instead.
 Set `REDASH_QUERY_URL` to `https://<redash-host>/api/queries/<id>` (the
 `/results.json` suffix is optional — it's stripped off either way).
 
-The sync tries to trigger a fresh execution rather than trust a stale cache:
-it POSTs `/api/queries/<id>/refresh`, polls `/api/jobs/<job_id>` until it
-finishes (up to `REDASH_REFRESH_TIMEOUT_MS`, default 60s), then fetches
-`/api/query_results/<id>.json`.
+The sync prefers reading whatever Redash already has **cached**
+(`/api/queries/<id>/results.json`) — fast, no waiting. It only triggers a
+brand-new execution (`POST /api/queries/<id>/refresh`, poll
+`/api/jobs/<job_id>` up to `REDASH_REFRESH_TIMEOUT_MS`, default 20 minutes,
+then fetch `/api/query_results/<id>.json`) when there's no cache yet at all
+— e.g. the very first run. For a large query (this one is 1.6M+ rows),
+forcing a fresh synchronous execution on every sync would be far slower
+than just reading a recently-cached result.
 
-**Key scope matters here.** A **query-scoped** API key (the one shown on an
-individual query's page — this is what the brief expects, since it's
-least-privilege) is only allowed to read that query's *cached* result, not
-trigger `/refresh` — Redash returns `403 "Please use a user API key"`. When
-that happens, the sync automatically falls back to GETting
-`/api/queries/<id>/results.json` (the cached result) instead. That only
-works if the query has a **Refresh Schedule** configured in the Redash UI
-(open the query → schedule/clock icon → set an interval matching how fresh
-you need the data) — otherwise even the fallback 404s with "No cached result
-found" because nothing has ever populated the cache. A **user-level** API
-key (from account profile settings) can skip needing a schedule since it's
-allowed to trigger `/refresh` itself, but it's a broader-permission key than
-this project needs.
+This means you need a **Refresh Schedule** configured on the query in the
+Redash UI (open the query → schedule/clock icon → set an interval matching
+how fresh you need the data, e.g. hourly) — that's what keeps the cache
+populated so most syncs hit the fast path.
+
+**Key scope matters for the fallback path.** A **query-scoped** API key
+(the one shown on an individual query's page — this is what the brief
+expects, since it's least-privilege) is only allowed to read a cached
+result, not trigger `/refresh` — Redash returns `403 "Please use a user
+API key"`. If that happens *and* there's no cache yet either, the sync has
+nothing left to try and fails with a clear error telling you to set the
+Refresh Schedule (or switch to a user-level key, which can trigger
+`/refresh` itself but is a broader-permission key than this project
+needs).
 
 Three ways to run the sync:
 
