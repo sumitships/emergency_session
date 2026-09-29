@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>AstroLokal | Emergency Connect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=5">
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <button class="back-btn" aria-label="Go back" onclick="history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="header-logo">
+        <img class="logo-mark" src="/assets/astrolokal-logo.png" alt="" width="24" height="24">
+        <span class="logo-text">AstroLokal</span>
+      </div>
+      <div class="header-spacer" aria-hidden="true"></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- SCREEN 1: Emergency pricing -->
+    <section id="screen-emergency" class="screen active">
+      <div class="hero-card">
+        <div class="avatar-wrap">
+          <div class="avatar-icon">
+            <img src="/assets/astrolokal-logo.png" alt="" width="56" height="56">
+          </div>
+          <div class="status-pill"><span class="dot"></span><span>Currently Offline</span></div>
+        </div>
+        <h1 class="astro-name" id="astro-name">Loading...</h1>
+        <p class="hero-subtext" id="connect-subtext">They're offline right now, but we'll try calling them for you.</p>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:var(--color-cta)"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+          Emergency Pricing
+        </div>
+        <div class="pricing-grid">
+          <div class="price-col regular">
+            <span class="label">Regular</span>
+            <span class="strike-wrap">
+              <span class="amount" id="regular-price">₹--<span class="unit">/min</span></span>
+            </span>
+          </div>
+          <div class="price-col emergency">
+            <span class="label">Emergency</span>
+            <span class="amount" id="emergency-price">₹--<span class="unit">/min</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer-card">
+        <span class="disclaimer-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <p>AstroLokal will try calling, but we can't promise they'll be able to take the call.</p>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: Waitlist confirmation -->
+    <section id="screen-waitlist" class="screen">
+      <div class="waitlist-hero">
+        <div class="bell-badge">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h2>You're on the list!</h2>
+        <p>We'll notify you the moment 24/7 Emergency Sessions go live for your profile.</p>
+        <div class="zero-charge-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m5-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          No money deducted &bull; ₹0 charged
+        </div>
+      </div>
+      <p class="waitlist-astro-note" id="waitlist-astro-note"></p>
+      <button class="home-btn" id="home-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-8 9 8M5 10v10h14V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to Home
+      </button>
+    </section>
+  </main>
+
+  <div class="cta-deck" id="cta-deck">
+    <button class="cta-btn" id="cta-btn" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+      <span id="cta-label">Loading...</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+<script src="/app.js?v=3"></script>
+</body>
+</html>
